@@ -8,12 +8,15 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.dicoding.storylistapp.data.pref.UserModel
 import com.dicoding.storylistapp.view.ViewModelFactory
 import com.dicoding.storylistapp.view.main.MainActivity
+import com.dicoding.storylistapp.data.retrofit.Result
+import com.example.storylistapp.R
 import com.example.storylistapp.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
@@ -59,6 +62,14 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun toastFailed() {
+        Toast.makeText(
+            this,
+            R.string.failed_login,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun showLoading(isLoading: Boolean) {

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.storylistapp.data.UserRepository
 import com.dicoding.storylistapp.di.Injection
+import com.dicoding.storylistapp.view.add.AddStoryViewModel
 import com.dicoding.storylistapp.view.login.LoginViewModel
 import com.dicoding.storylistapp.view.main.MainViewModel
 import com.dicoding.storylistapp.view.signup.SignupViewModel

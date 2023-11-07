@@ -71,7 +71,7 @@ class UserRepository private constructor(
         liveData (Dispatchers.IO) {
             emit(Result.Loading)
             try {
-                val response = apiService.getStories(("Bearer $token"))
+                val response = apiService.getStories("Bearer $token")
                 val stories = response.listStory
                 emit(Result.Success(stories))
             } catch (e: Exception){
@@ -98,10 +98,11 @@ class UserRepository private constructor(
         @Volatile
         private var instance: UserRepository? = null
         fun getInstance(
-            userPreference: UserPreference
+            userPreference: UserPreference,
+            serviceApi: ServiceApi
         ): UserRepository =
             instance ?: synchronized(this) {
-                instance ?: UserRepository(userPreference)
+                instance ?: UserRepository(userPreference,serviceApi )
             }.also { instance = it }
     }
 }

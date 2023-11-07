@@ -33,7 +33,7 @@
             android:name="com.dicoding.storylistapp.view.detail.DetailActivity"
             android:exported="false" />
         <activity
-            android:name="com.dicoding.storylistapp.view.add.AddstoryActivity"
+            android:name="com.dicoding.storylistapp.view.add.AddStoryActivity"
             android:exported="false" />
         <activity
             android:name="com.dicoding.storylistapp.view.main.MainActivity"

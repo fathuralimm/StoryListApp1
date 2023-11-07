@@ -15,44 +15,36 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.storylistapp.databinding.ActivitySignupBinding
+import com.dicoding.storylistapp.data.retrofit.Result
+import com.dicoding.storylistapp.view.ViewModelFactory
+import com.dicoding.storylistapp.view.login.LoginActivity
+import com.example.storylistapp.R
 
 class SignupActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySignupBinding
-    private lateinit var myEditText: MyPasswordEditText
-    private val viewModel by viewModels<SignUpViewModel>  {
-        viewModelFactory.getInstance(this)
+
+    private val viewModel by viewModels<SignupViewModel> {
+        ViewModelFactory.getInstance(this)
     }
+    private lateinit var binding: ActivitySignupBinding
+    private lateinit var myPasswordEditText: MyPasswordEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        myEditText = binding.passwordEditText
+        myPasswordEditText = binding.passwordEditText
 
         setupView()
-        setupAction()
+        playAnimation()
         setupAction()
         setupLogin()
-    }
-
-    private fun setupView() {
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsets.Type.statusBars())
-        } else {
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-        }
-        supportActionBar?.hide()
     }
 
     private fun setupAction() {
         binding.signupButton.setOnClickListener {
             binding.apply {
-                if (nameEditText.error.isNullOrEmpty() && emailEdittext.error.isNullOrEmpty() && passwordEditText.error.isNullOrEmpty()){
+                if (nameEditText.error.isNullOrEmpty() && emailEditText.error.isNullOrEmpty() && passwordEditText.error.isNullOrEmpty()){
                     val name = nameEditText.text.toString().trim()
                     val email = emailEditText.text.toString().trim()
                     val password = passwordEditText.text.toString().trim()
@@ -73,16 +65,16 @@ class SignupActivity : AppCompatActivity() {
                 }
                 is Result.Success -> {
                     showLoading(false)
-                    AlertDialog.Builder(this).apply{
+                    AlertDialog.Builder(this).apply {
                         setTitle("Alright!")
                         setMessage("Account with $email is created. Let\'s Login!")
                         setCancelable(false)
-                        setPositiveButton("Login"){_, _->
+                        setPositiveButton("Login"){_, _ ->
                             val intent = Intent(context, LoginActivity::class.java)
                             startActivity(intent)
                             finish()
                         }
-                        cretae()
+                        create()
                         show()
                     }
                 }
@@ -100,6 +92,28 @@ class SignupActivity : AppCompatActivity() {
             R.string.failed_register,
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility =
+            when (isLoading) {
+                true -> View.VISIBLE
+                else -> View.GONE
+            }
+
+    }
+
+    private fun setupView() {
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
+        supportActionBar?.hide()
     }
 
     private fun playAnimation() {

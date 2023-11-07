@@ -1,34 +1,48 @@
 package com.dicoding.storylistapp.view.add
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.dicoding.storylistapp.data.getImageUri
+import com.dicoding.storylistapp.data.reduceFileImage
+import com.dicoding.storylistapp.data.uriToFile
 import com.dicoding.storylistapp.view.ViewModelFactory
+import com.dicoding.storylistapp.view.main.MainActivity
+import com.example.storylistapp.R
 import com.example.storylistapp.databinding.ActivityAddStoryBinding
 import com.example.storylistapp.databinding.ActivityLoginBinding
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import com.dicoding.storylistapp.data.retrofit.Result
 
-class AddstoryActivity : AppCompatActivity() {
-    private val viewModel by viewmodels<AddstoryViewModel> {
+class AddStoryActivity : AppCompatActivity() {
+    private val viewModel by viewModels<AddStoryViewModel> {
         ViewModelFactory.getInstance(this)
     }
 
     private lateinit var binding: ActivityAddStoryBinding
-    private var currentimageUri: Uri? = null
+    private var currentImageUri: Uri? = null
 
-    override fun oncreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         if (!allPermissionGranted()) {
-            requestPermissions.launch(REQUIRED_PERMISSION)
+            requestPermission.launch(REQUIRED_PERMISSION)
         }
 
         val launcherIntentCamera = registerForActivityResult(
@@ -37,12 +51,13 @@ class AddstoryActivity : AppCompatActivity() {
             if (isSuccess){
                 showImage()
             }
-        )
+        }
+
         postStory()
 
         binding.cameraButton.setOnClickListener {
             currentImageUri = getImageUri(this)
-            launcherIntentCamera.launch(currentimageUri)
+            launcherIntentCamera.launch(currentImageUri)
         }
 
         binding.galleryButton.setOnClickListener {
@@ -51,19 +66,18 @@ class AddstoryActivity : AppCompatActivity() {
 
         binding.uploadButton.setOnClickListener {
             var token: String
-            currentImageUri?.let { uri ->
+            currentImageUri?.let{ uri ->
                 val imageFile = uriToFile(uri, this).reduceFileImage()
                 val description = binding.edtDescription.text.toString()
 
                 if (description.isNullOrEmpty()) {
                     AlertDialog.Builder(this).apply {
-                        setTittle("Please tell us about your story :)")
+                        setTitle("Please tell us about your story :)")
                         setMessage(getString(R.string.empty_description))
                         setCancelable(false)
                         setPositiveButton(getString(R.string.ok_message)) { _, _ ->
-                            val intent = Intent(context, AddstoryActivity::class.java)
-                            intent.flags =
-                                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            val intent = Intent(context, AddStoryActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)
                             finish()
                         }
@@ -79,7 +93,6 @@ class AddstoryActivity : AppCompatActivity() {
                         "photo",
                         imageFile.name,
                         requestImageFile
-
                     )
 
                     viewModel.getSession().observe(this) { user ->
@@ -95,18 +108,16 @@ class AddstoryActivity : AppCompatActivity() {
         viewModel.addStoryResponse.observe(this){
             when (it){
                 is Result.Loading -> {
-                    showloading(true)
+                    showLoading(true)
                     disableInterface()
                 }
-                is result.Succes -> {
-                    showloading(true)
+                is  Result.Success -> {
+                    showLoading(false)
                     enableInterface()
-                    AlertDialeog.Builder(this).apply {
-                        setTittle("Alright")
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Alright")
                         setMessage(getString(R.string.upload_message))
-                        setCancelelable(false)
-                        setPositiveButton(getString(R.string.next_message))
-                        setCancellable(false)
+                        setCancelable(false)
                         setPositiveButton(getString(R.string.next_message)) { _, _ ->
                             val intent = Intent(context, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -121,17 +132,15 @@ class AddstoryActivity : AppCompatActivity() {
                     showLoading(false)
                     enableInterface()
                 }
-
             }
         }
-
     }
 
     private fun disableInterface() {
-        binding.cameraButton.isEnabled = flase
-        binding.galleryButton.isEnabled = flase
-        binding.uploadButton.isEnabled = flase
-        binding.edtDescription.isEnabled = flase
+        binding.cameraButton.isEnabled = false
+        binding.galleryButton.isEnabled = false
+        binding.uploadButton.isEnabled = false
+        binding.edtDescription.isEnabled = false
     }
 
     private fun enableInterface() {
@@ -139,19 +148,15 @@ class AddstoryActivity : AppCompatActivity() {
         binding.galleryButton.isEnabled = true
         binding.uploadButton.isEnabled = true
         binding.edtDescription.isEnabled = true
-
     }
 
-    private val requestedPermission = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()) { isGranted: boolean ->
-        when (isGranted) {
+    private val requestPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) {
+            isGranted: Boolean ->
+        when (isGranted){
             true -> {
-                Toast.makeText(this, "Permission request granted", Toast.LENGHT_LONG).show()
-            }
-
-            false -> {
-                Toast.makeText(this, "Permission request denied", Toast.LENGHT_LONG).show()
-            }
+                Toast.makeText(this, "Permission request granted", Toast.LENGTH_LONG).show()}
+            false -> {Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()}
         }
     }
 
@@ -161,8 +166,8 @@ class AddstoryActivity : AppCompatActivity() {
 
 
     private val launcherGallery = registerForActivityResult(
-        activityResultContracts.PickVisualMedia()
-    ) { uri: Uri?} ->
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
         if (uri != null) {
             currentImageUri = uri
             showImage()
@@ -171,21 +176,21 @@ class AddstoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun showToast(message: String) {
+    private fun showToast(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showImage() {
         currentImageUri?.let {
-            log.d("Image URI", "show Image:$it")
+            Log.d("Image URI", "show Image:$it")
             binding.previewImageView.setImageURI(it)
         }
     }
 
-    private fun showloading(isLoading: Boolean) {
-        binding.progresIndicator.visibility = if (isLoading) view.VISIBLE else View.GONE
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressIndicator.visibility = if(isLoading) View.VISIBLE else View.GONE
     }
     companion object {
-        private constval REQUIRED_PERMISSION = Manifest.permssion.CAMERA
+        private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
     }
 }

@@ -29,7 +29,7 @@ class WelcomeActivity : AppCompatActivity() {
     private fun setupView() {
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide((WindowInsets.Type.statusBars())
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -57,15 +57,15 @@ class WelcomeActivity : AppCompatActivity() {
 
         val login = ObjectAnimator.ofFloat(binding.loginButton, View.ALPHA, 1f).setDuration(300)
         val signup = ObjectAnimator.ofFloat(binding.signupButton, View.ALPHA, 1f).setDuration(300)
-        val title = ObjectAnimator.ofFloat(binding.tittleTextButton, View.ALPHA, 1f).setDuration(300)
-        val desc = ObjectAnimator.ofFloat(binding.descButton, View.ALPHA, 1f).setDuration(300)
+        val title = ObjectAnimator.ofFloat(binding.titleTextView, View.ALPHA, 1f).setDuration(300)
+        val desc = ObjectAnimator.ofFloat(binding.descTextView, View.ALPHA, 1f).setDuration(300)
 
         val together = AnimatorSet().apply {
             playTogether(login, signup)
         }
 
         AnimatorSet().apply{
-            playSequementially(tittle, desc, together)
+            playSequentially(title, desc, together)
             startDelay = 200
         }.start()
     }

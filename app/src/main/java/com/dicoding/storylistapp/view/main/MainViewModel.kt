@@ -7,7 +7,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.dicoding.storylistapp.data.UserRepository
 import com.dicoding.storylistapp.data.pref.UserModel
+import com.dicoding.storylistapp.data.response.ListStoryItem
 import kotlinx.coroutines.launch
+import com.dicoding.storylistapp.data.retrofit.Result
 
 class MainViewModel(private val repository: UserRepository) : ViewModel() {
     fun getSession(): LiveData<UserModel> {
@@ -21,7 +23,7 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
     }
 
     private val _storyListItem = MediatorLiveData<Result<List<ListStoryItem>>>()
-    val StoryListItem: LiveData<Result<List<listStoryItem>>> = _storyListItem
+    val StoryListItem: LiveData<Result<List<ListStoryItem>>> = _storyListItem
 
     fun getStories(token: String) {
         val liveData = repository.getStories(token)

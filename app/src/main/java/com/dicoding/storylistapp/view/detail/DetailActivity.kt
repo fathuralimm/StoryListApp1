@@ -1,8 +1,11 @@
 package com.dicoding.storylistapp.view.detail
 
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.dicoding.storylistapp.data.response.ListStoryItem
+import com.example.storylistapp.databinding.ActivityDetailBinding
 
 class DetailActivity: AppCompatActivity() {
     private lateinit var listStoryItem: ListStoryItem

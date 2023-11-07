@@ -8,6 +8,7 @@ import com.dicoding.storylistapp.data.UserRepository
 import com.dicoding.storylistapp.data.pref.UserModel
 import com.dicoding.storylistapp.data.response.LoginResponse
 import kotlinx.coroutines.launch
+import com.dicoding.storylistapp.data.retrofit.Result
 
 class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
