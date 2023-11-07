@@ -3,15 +3,25 @@ package com.dicoding.storylistapp.data
 import android.media.session.MediaSession.Token
 import android.view.PixelCopy.Request
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataScope
 import androidx.lifecycle.liveData
 import com.dicoding.storylistapp.data.pref.UserModel
 import com.dicoding.storylistapp.data.pref.UserPreference
+import com.dicoding.storylistapp.data.response.AddResponse
+import com.dicoding.storylistapp.data.response.ListStoryItem
+import com.dicoding.storylistapp.data.response.LoginResponse
+import com.dicoding.storylistapp.data.response.RegisterResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody
+import com.dicoding.storylistapp.data.retrofit.Result
+import com.dicoding.storylistapp.data.retrofit.ServiceApi
+import okhttp3.MultipartBody
+
 
 class UserRepository private constructor(
-    private val userPreference: UserPreference
+    private val userPreference: UserPreference,
+    private val apiService: ServiceApi
 )  {
 
     suspend fun saveSession(user: UserModel) {
@@ -31,29 +41,29 @@ class UserRepository private constructor(
         email: String,
         password: String
     ):LiveData<Result<RegisterResponse>> =
-        LiveData(Dispatchers.IO) {
+        liveData(Dispatchers.IO) {
             emit(Result.Loading)
             try {
-                val response = apiService .register(name, email, password)
+                val response = apiService.register(name, email, password)
                 emit(Result.Success(response))
             }catch (e: Exception){
                 emit(Result.Error(e.message.toString()))
             }
         }
 
-    fun Login(
+    fun login(
         email: String,
         password: String
     ):LiveData<Result<LoginResponse>> =
-        LiveData(Dispatchers.IO) {
+        liveData(Dispatchers.IO) {
             emit(Result.Loading)
             try {
                 val response = apiService.login(email, password)
                 val token = response.loginResult.token
                 saveSession(UserModel(email, token))
-                emkit(Result.Success(response))
+                emit(Result.Success(response))
             } catch (e: Exception) {
-                emit(Result.Error(e.message.to=String()))
+                emit(Result.Error(e.message.toString()))
             }
         }
 
@@ -64,7 +74,7 @@ class UserRepository private constructor(
                 val response = apiService.getStories(("Bearer $token"))
                 val stories = response.listStory
                 emit(Result.Success(stories))
-            } catch (e: Expection){
+            } catch (e: Exception){
                 emit(Result.Error(e.message.toString()))
             }
         }

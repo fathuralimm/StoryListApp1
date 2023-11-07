@@ -1,8 +1,11 @@
 package com.dicoding.storylistapp.data.retrofit
 
+import com.dicoding.storylistapp.data.response.AddResponse
 import com.dicoding.storylistapp.data.response.LoginResponse
 import com.dicoding.storylistapp.data.response.RegisterResponse
 import com.dicoding.storylistapp.data.response.StoriesResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -14,7 +17,7 @@ import retrofit2.http.Part
 interface ServiceApi {
     @FormUrlEncoded
     @POST("register")
-    suspend fun resgister(
+    suspend fun register(
         @Field("name") name : String,
         @Field("email") email : String,
         @Field("password") password: String
@@ -22,7 +25,7 @@ interface ServiceApi {
 
     @FormUrlEncoded
     @POST("login")
-    suspend fun Login(
+    suspend fun login(
         @Field("email") email: String,
         @Field("password") password: String
     ): LoginResponse
@@ -36,8 +39,8 @@ interface ServiceApi {
     @Multipart
     @POST("stories")
     suspend fun postStories(
-        @Header("Authorization") token: String
-        @Part file: Multiplayer.Part,
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody,
         @Part("lat") lat: RequestBody? = null,
         @Part("lon") lon: RequestBody? = null

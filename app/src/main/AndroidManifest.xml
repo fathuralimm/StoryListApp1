@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
@@ -19,8 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StoryListApp"
         tools:targetApi="31">
-
-
+        <activity
+            android:name="com.dicoding.storylistapp.view.welcome.WelcomeActivity"
+            android:exported="false" />
         <activity
             android:name="com.dicoding.storylistapp.view.login.LoginActivity"
             android:exported="false" />
@@ -35,7 +37,7 @@
             android:exported="false" />
         <activity
             android:name="com.dicoding.storylistapp.view.main.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -66,7 +68,6 @@
                 android:name="photopicker_activity:0:required"
                 android:value="" />
         </service>
-
     </application>
 
 </manifest>
